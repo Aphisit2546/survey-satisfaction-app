@@ -1,0 +1,318 @@
+/* ============================================
+   InstructionSection Styles
+   ============================================ */
+
+.instruction-section {
+    background: #ffffff;
+    border-radius: 16px;
+    padding: 32px;
+    margin-bottom: 32px;
+    box-shadow: var(--shadow-sm);
+    border: 1px solid var(--border-color);
+}
+
+/* Header */
+.instruction-header {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    margin-bottom: 32px;
+    padding-bottom: 20px;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.instruction-icon {
+    font-size: 24px;
+    color: var(--primary-color);
+    background: #eff6ff;
+    padding: 10px;
+    border-radius: 12px;
+}
+
+.instruction-title {
+    font-size: 20px;
+    font-weight: 700;
+    color: var(--text-primary);
+    margin: 0;
+    letter-spacing: -0.5px;
+}
+
+/* Screen Preview Image - Now using global .section-image-container styles */
+
+.screen-preview:hover {
+    transform: scale(1.02);
+}
+
+/* QR Code Section */
+.qr-section {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-bottom: 40px;
+    padding: 32px;
+    background: #ffffff;
+    border-radius: 16px;
+    border: 1px solid var(--border-color);
+}
+
+.qr-code {
+    width: 160px;
+    height: 160px;
+    margin-bottom: 16px;
+    border-radius: 12px;
+    border: 4px solid #fff;
+    box-shadow: 0 0 0 2px #e2e8f0;
+}
+
+.qr-caption {
+    color: var(--text-secondary);
+    font-size: 15px;
+    line-height: 1.6;
+    text-align: center;
+}
+
+.android-icon {
+    color: #10b981;
+    font-size: 20px;
+    vertical-align: middle;
+    margin-right: 6px;
+}
+
+.note {
+    display: inline-block;
+    color: var(--danger-color);
+    font-size: 13px;
+    font-weight: 500;
+    margin-top: 4px;
+    background: #fee2e2;
+    padding: 2px 8px;
+    border-radius: 4px;
+}
+
+/* Demo Alert */
+.demo-alert {
+    background-color: #fffbeb;
+    border: 1px solid #f9da9d;
+    color: #92400e;
+    padding: 20px;
+    border-radius: 12px;
+    margin-bottom: 32px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.alert-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    font-weight: 500;
+}
+
+.alert-icon {
+    font-size: 20px;
+    color: #d97706;
+    margin-top: 2px;
+}
+
+/* Info Grid (Two Columns) */
+.info-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 24px;
+    margin-bottom: 32px;
+}
+
+.info-card {
+    background: #ffffff;
+    padding: 24px;
+    border-radius: 16px;
+    border: 1px solid var(--border-color);
+    transition: box-shadow 0.3s ease;
+}
+
+.info-card:hover {
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.05);
+}
+
+.card-title {
+    font-size: 16px;
+    font-weight: 700;
+    margin: 0 0 20px 0;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    color: var(--text-primary);
+    border-bottom: 1px solid var(--border-color);
+    padding-bottom: 12px;
+}
+
+/* Credentials Styles */
+.credential-list {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.credential-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: #f8fafc;
+    padding: 12px 16px;
+    border-radius: 8px;
+    border: 1px solid var(--border-color);
+    font-size: 14px;
+}
+
+.credential-group {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.label {
+    font-weight: 600;
+    color: var(--text-secondary);
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.value {
+    color: var(--text-primary);
+    font-family: 'Space Mono', 'Courier New', monospace;
+    font-weight: 600;
+    font-size: 15px;
+}
+
+.otp-value {
+    color: var(--primary-color);
+}
+
+/* Limitations Styles */
+.limitations-list {
+    margin: 0;
+    padding-left: 20px;
+    font-size: 15px;
+    color: var(--text-secondary);
+    line-height: 1.6;
+}
+
+.limitations-list li {
+    margin-bottom: 10px;
+}
+
+.limitations-list li::marker {
+    color: var(--danger-color);
+}
+
+/* Rating Scale */
+.rating-scale-section {
+    background: #ffffff;
+    padding: 32px;
+    border-radius: 16px;
+    border: 1px solid var(--border-color);
+}
+
+.scale-title {
+    font-size: 18px;
+    font-weight: 700;
+    color: var(--text-primary);
+    margin: 0 0 24px 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 10px;
+}
+
+.star-icon {
+    color: #eab308;
+    font-size: 24px;
+}
+
+.scale-list-visual {
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+    max-width: 500px;
+    margin: 0 auto;
+}
+
+.scale-row {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 24px;
+    padding: 16px 0;
+    border-bottom: 1px solid #f1f5f9;
+}
+
+.scale-row:last-child {
+    border-bottom: none;
+}
+
+.stars-display {
+    display: flex;
+    gap: 4px;
+}
+
+.star-filled {
+    color: #fbbf24;
+    /* Amber-400 */
+    font-size: 20px;
+}
+
+.star-empty {
+    color: #e2e8f0;
+    /* Slate-200 */
+    font-size: 20px;
+}
+
+.scale-meaning {
+    font-size: 16px;
+    color: var(--text-secondary);
+    min-width: 180px;
+}
+
+.meaning-highlight {
+    color: #2563eb;
+    /* Blue-600 */
+    font-weight: 700;
+    margin-left: 6px;
+}
+
+/* Responsive adjustment for rating rows */
+@media (max-width: 480px) {
+    .scale-row {
+        flex-direction: column;
+        gap: 8px;
+        text-align: center;
+    }
+
+    .scale-meaning {
+        min-width: auto;
+    }
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .instruction-section {
+        padding: 20px;
+    }
+
+    .info-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .credential-item {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 8px;
+    }
+
+    .credential-group {
+        width: 100%;
+        justify-content: space-between;
+    }
+}

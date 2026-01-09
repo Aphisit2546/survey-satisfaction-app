@@ -1,0 +1,120 @@
+/* Stepper Container */
+.stepper-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    width: 100%;
+    margin-bottom: 40px;
+    position: relative;
+    padding: 0 10px;
+}
+
+/* Individual Step Item */
+.step-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    position: relative;
+    flex: 1;
+}
+
+/* Connecting Line */
+.step-line {
+    position: absolute;
+    top: 15px;
+    /* Half height of circle (30px / 2) */
+    right: 50%;
+    width: 100%;
+    /* Connects to previous step */
+    height: 2px;
+    background-color: #e0e0e0;
+    z-index: 0;
+    /* Lower z-index */
+}
+
+.step-item:first-child .step-line {
+    display: none;
+}
+
+/* Active/Completed Line Color */
+.step-item.completed .step-line,
+.step-item.active .step-line {
+    background-color: var(--primary-color, #4facfe);
+}
+
+/* Step Content Wrapper */
+.step-content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    background-color: transparent;
+    /* Ensure transparent background */
+    position: relative;
+    z-index: 2;
+    /* Higher z-index to sit on top of line */
+}
+
+/* Step Circle */
+.step-circle {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    background-color: #fff;
+    /* Ensure background is opaque */
+    border: 2px solid #e0e0e0;
+    color: #999;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-weight: 600;
+    font-size: 14px;
+    transition: all 0.3s ease;
+    /* z-index handled by wrapper */
+}
+
+/* Label */
+.step-label {
+    font-size: 12px;
+    color: #999;
+    text-align: center;
+    white-space: nowrap;
+    font-weight: 400;
+    transition: color 0.3s ease;
+}
+
+/* Active State */
+.step-item.active .step-circle {
+    border-color: var(--primary-color, #4facfe);
+    color: var(--primary-color, #4facfe);
+    box-shadow: 0 0 0 4px rgba(79, 172, 254, 0.1);
+    background-color: #fff;
+}
+
+.step-item.active .step-label {
+    color: var(--primary-color, #4facfe);
+    font-weight: 600;
+}
+
+/* Completed State */
+.step-item.completed .step-circle {
+    background-color: var(--primary-color, #4facfe);
+    border-color: var(--primary-color, #4facfe);
+    color: #fff;
+}
+
+.step-item.completed .step-label {
+    color: var(--primary-color, #4facfe);
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .step-label {
+        display: none;
+        /* Hide labels on mobile to save space */
+    }
+
+    .stepper-container {
+        margin-bottom: 24px;
+    }
+}

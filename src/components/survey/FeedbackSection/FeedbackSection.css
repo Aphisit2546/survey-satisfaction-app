@@ -1,0 +1,33 @@
+/* ============================================
+   FeedbackSection Component Styles
+   ============================================ */
+
+.optional-note {
+    background-color: #fff3cd;
+    border-left-color: #ffc107;
+    color: #856404;
+}
+
+.feedback-group {
+    margin-bottom: 24px;
+}
+
+.feedback-label {
+    display: block;
+    font-size: 15px;
+    font-weight: 500;
+    color: #333;
+    margin-bottom: 8px;
+    line-height: 1.5;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .feedback-group {
+        margin-bottom: 20px;
+    }
+
+    .feedback-label {
+        font-size: 14px;
+    }
+}

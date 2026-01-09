@@ -18,6 +18,15 @@ export default function InstructionSection() {
                 {/* Screen Image */}
                 <div className="section-image-container">
                     <img src={screenImage} alt="Screen Preview" className="section-image-preview" />
+
+                    <button
+                        type="button"
+                        className="dashboard-btn"
+                        onClick={() => window.open('/dashboard', '_self')}
+                    >
+                        <span className="btn-icon">📊</span>
+                        <span>ดูผลสรุปการประเมิน (Dashboard)</span>
+                    </button>
                 </div>
 
                 {/* QR Code Section */}

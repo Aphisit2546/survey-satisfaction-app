@@ -4,6 +4,7 @@
 import { createBrowserRouter } from 'react-router-dom';
 import SurveyPage from './pages/SurveyPage/SurveyPage';
 import SuccessPage from './pages/SuccessPage/SuccessPage';
+import DashboardPage from './pages/DashboardPage/DashboardPage';
 
 const router = createBrowserRouter([
     {
@@ -14,6 +15,10 @@ const router = createBrowserRouter([
     {
         path: '/success',
         element: <SuccessPage />,
+    },
+    {
+        path: '/dashboard',
+        element: <DashboardPage />,
     },
 ]);
 

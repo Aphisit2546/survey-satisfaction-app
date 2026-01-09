@@ -158,6 +158,28 @@ function calculateAverage(data, field) {
   return (sum / data.length).toFixed(2);
 }
 
+/**
+ * ดึงข้อมูลแบบประเมินทั้งหมดเพื่อนำมาคำนวณสถิติ
+ * @returns {Promise<Object>} - ข้อมูลแบบประเมินทั้งหมด
+ */
+export async function fetchAllResponses() {
+  try {
+    const { data, error } = await supabase
+      .from('survey_responses')
+      .select('*');
+
+    if (error) {
+      console.error('❌ Error fetching all responses:', error);
+      throw error;
+    }
+
+    return { success: true, data };
+  } catch (error) {
+    console.error('❌ Exception in fetchAllResponses:', error);
+    return { success: false, error: error.message };
+  }
+}
+
 // ============================================
 // Export Default
 // ============================================

@@ -122,6 +122,15 @@ export default function DashboardPage() {
         });
     };
 
+    const getInterpretation = (mean) => {
+        const score = parseFloat(mean);
+        if (score >= 4.50) return 'มากที่สุด (ดีมาก)';
+        if (score >= 3.50) return 'มาก (ดี)';
+        if (score >= 2.50) return 'ปานกลาง';
+        if (score >= 1.50) return 'น้อย (พอใช้)';
+        return 'น้อยที่สุด (ควรปรับปรุง)';
+    };
+
     if (loading) return <div className="loading-container">กำลังโหลดข้อมูล...</div>;
     if (error) return <div className="error-container">เกิดข้อผิดพลาด: {error}</div>;
 
@@ -135,6 +144,7 @@ export default function DashboardPage() {
                             <th>หัวข้อการประเมิน</th>
                             <th className="center" width="100">Mean</th>
                             <th className="center" width="100">S.D.</th>
+                            <th className="center" width="150">ความหมาย</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -143,6 +153,7 @@ export default function DashboardPage() {
                                 <td>{idx + 1}. {item.label}</td>
                                 <td className="center">{item.mean}</td>
                                 <td className="center">{item.sd}</td>
+                                <td className="center">{getInterpretation(item.mean)}</td>
                             </tr>
                         ))}
                         {/* Summary Row */}
@@ -150,6 +161,7 @@ export default function DashboardPage() {
                             <td><strong>5. {summaryLabel}</strong></td>
                             <td className="center"><strong>{dataObj.summary.mean}</strong></td>
                             <td className="center"><strong>{dataObj.summary.sd}</strong></td>
+                            <td className="center"><strong>{getInterpretation(dataObj.summary.mean)}</strong></td>
                         </tr>
                     </tbody>
                 </table>
@@ -195,6 +207,7 @@ export default function DashboardPage() {
                                             <th>หัวข้อการประเมิน</th>
                                             <th className="center" width="100">Mean</th>
                                             <th className="center" width="100">S.D.</th>
+                                            <th className="center" width="150">ความหมาย</th>
                                         </tr>
                                     </thead>
                                     <tbody>
@@ -202,26 +215,31 @@ export default function DashboardPage() {
                                             <td>1. ภาพรวมด้านการออกแบบ (Design Aspect)</td>
                                             <td className="center">{stats.design.summary.mean}</td>
                                             <td className="center">{stats.design.summary.sd}</td>
+                                            <td className="center">{getInterpretation(stats.design.summary.mean)}</td>
                                         </tr>
                                         <tr>
                                             <td>2. ภาพรวมด้านคุณภาพระบบ (System Quality)</td>
                                             <td className="center">{stats.quality.summary.mean}</td>
                                             <td className="center">{stats.quality.summary.sd}</td>
+                                            <td className="center">{getInterpretation(stats.quality.summary.mean)}</td>
                                         </tr>
                                         <tr>
                                             <td>3. ภาพรวมด้านการใช้งาน (Usability)</td>
                                             <td className="center">{stats.usability.summary.mean}</td>
                                             <td className="center">{stats.usability.summary.sd}</td>
+                                            <td className="center">{getInterpretation(stats.usability.summary.mean)}</td>
                                         </tr>
                                         <tr>
                                             <td>4. ภาพรวมด้านประโยชน์ที่ได้รับ (Usefulness)</td>
                                             <td className="center">{stats.usefulness.summary.mean}</td>
                                             <td className="center">{stats.usefulness.summary.sd}</td>
+                                            <td className="center">{getInterpretation(stats.usefulness.summary.mean)}</td>
                                         </tr>
                                         <tr className="grand-total-row">
                                             <td><strong>สรุปภาพรวมระบบทั้งหมด</strong></td>
                                             <td className="center"><strong>{stats.overall.mean}</strong></td>
                                             <td className="center"><strong>{stats.overall.sd}</strong></td>
+                                            <td className="center"><strong>{getInterpretation(stats.overall.mean)}</strong></td>
                                         </tr>
                                     </tbody>
                                 </table>

@@ -157,7 +157,7 @@ export default function SurveyPage() {
                         แบบประเมินความพึงพอใจของผู้ใช้งานต่อระบบ
                     </h1>
                     <p className="survey-subtitle">
-                        Satisfaction Survey Application
+                        ระบบเปิด-ปิดประตูม้วนเหล็กระยะไกล
                     </p>
                 </header>
 

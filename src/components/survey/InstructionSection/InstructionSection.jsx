@@ -35,19 +35,11 @@ export default function InstructionSection() {
                     <p className="qr-caption">
                         <FaAndroid className="android-icon" /> QR Code เพื่อโหลดเป็นไฟล์ APK เพื่อทดสอบการใช้งานระบบ<br />
                         <span className="note">(ใช้ได้แค่ Android)</span>
+                        <div className="alert-item">
+                            <FaExclamationTriangle className="alert-icon" />
+                            <span>หากไม่ทดสอบหรือทดสอบไม่ได้ สามารถดู UI ข้างบนแทนได้เลยครับ</span>
+                        </div>
                     </p>
-                </div>
-
-                {/* Warning / Demo Note */}
-                <div className="demo-alert">
-                    <div className="alert-item">
-                        <FaExclamationTriangle className="alert-icon" />
-                        <span>เป็น Demo ไม่ได้เชื่อมต่อกับระบบหรือฐานข้อมูลจริง</span>
-                    </div>
-                    <div className="alert-item">
-                        <FaExclamationTriangle className="alert-icon" />
-                        <span>หากไม่ทดสอบหรือทดสอบไม่ได้ สามารถดู UI ข้างบนแทนได้เลยครับ</span>
-                    </div>
                 </div>
 
                 <div className="info-grid">

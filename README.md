@@ -212,9 +212,8 @@ This project is for educational purposes only.
 
 ## 👥 Contact
 
-- **Developer:** Your Name
-- **Email:** your.email@example.com
-- **Project Link:** [https://github.com/yourusername/survey-satisfaction-app](https://github.com/yourusername/survey-satisfaction-app)
+- **Developer:** Pee Aphisit
+- **Email:** apisit9048@gmail.com
 
 ---
 
@@ -228,4 +227,4 @@ This project is for educational purposes only.
 
 ---
 
-**Made with ❤️ by [Your Name]**
+**Made with ❤️ by Pee Aphisit**

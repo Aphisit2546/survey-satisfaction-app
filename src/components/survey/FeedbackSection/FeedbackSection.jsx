@@ -3,6 +3,7 @@
 // ============================================
 import Textarea from '../../common/Textarea/Textarea';
 import { FEEDBACK_QUESTIONS } from '../../../utils/constants';
+import screenImage from '../../../assets/images/screen.png';
 import './FeedbackSection.css';
 
 export default function FeedbackSection({ formData, errors, onChange }) {
@@ -14,7 +15,7 @@ export default function FeedbackSection({ formData, errors, onChange }) {
             </p>
 
             <div className="section-image-container">
-                <img src="/src/assets/images/screen.png" alt="Screen Preview" className="section-image-preview" />
+                <img src={screenImage} alt="Screen Preview" className="section-image-preview" />
             </div>
 
             {FEEDBACK_QUESTIONS.map((question) => (

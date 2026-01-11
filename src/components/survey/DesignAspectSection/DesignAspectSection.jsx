@@ -3,6 +3,7 @@
 // ============================================
 import StarRating from '../../common/StarRating/StarRating';
 import { DESIGN_QUESTIONS } from '../../../utils/constants';
+import screenImage from '../../../assets/images/screen.png';
 import './DesignAspectSection.css';
 
 export default function DesignAspectSection({ formData, errors, onChange }) {
@@ -14,7 +15,7 @@ export default function DesignAspectSection({ formData, errors, onChange }) {
             </p>
 
             <div className="section-image-container">
-                <img src="/src/assets/images/screen.png" alt="Screen Preview" className="section-image-preview" />
+                <img src={screenImage} alt="Screen Preview" className="section-image-preview" />
             </div>
 
             {DESIGN_QUESTIONS.map((question, index) => (

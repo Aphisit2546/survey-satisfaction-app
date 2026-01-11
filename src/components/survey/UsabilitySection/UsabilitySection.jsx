@@ -3,6 +3,7 @@
 // ============================================
 import StarRating from '../../common/StarRating/StarRating';
 import { USABILITY_QUESTIONS } from '../../../utils/constants';
+import screenImage from '../../../assets/images/screen.png';
 import '../DesignAspectSection/DesignAspectSection.css';
 
 export default function UsabilitySection({ formData, errors, onChange }) {
@@ -14,7 +15,7 @@ export default function UsabilitySection({ formData, errors, onChange }) {
             </p>
 
             <div className="section-image-container">
-                <img src="/src/assets/images/screen.png" alt="Screen Preview" className="section-image-preview" />
+                <img src={screenImage} alt="Screen Preview" className="section-image-preview" />
             </div>
 
             {USABILITY_QUESTIONS.map((question, index) => (

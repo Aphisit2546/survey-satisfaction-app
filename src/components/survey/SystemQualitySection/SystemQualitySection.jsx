@@ -3,6 +3,7 @@
 // ============================================
 import StarRating from '../../common/StarRating/StarRating';
 import { QUALITY_QUESTIONS } from '../../../utils/constants';
+import screenImage from '../../../assets/images/screen.png';
 import '../DesignAspectSection/DesignAspectSection.css';
 
 export default function SystemQualitySection({ formData, errors, onChange }) {
@@ -14,7 +15,7 @@ export default function SystemQualitySection({ formData, errors, onChange }) {
             </p>
 
             <div className="section-image-container">
-                <img src="/src/assets/images/screen.png" alt="Screen Preview" className="section-image-preview" />
+                <img src={screenImage} alt="Screen Preview" className="section-image-preview" />
             </div>
 
             {QUALITY_QUESTIONS.map((question, index) => (

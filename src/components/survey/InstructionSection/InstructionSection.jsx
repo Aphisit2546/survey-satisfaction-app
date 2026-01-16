@@ -90,7 +90,7 @@ export default function InstructionSection() {
                 <div className="info-grid">
                     {/* Test Credentials */}
                     <div className="info-card credentials-card">
-                        <h3 className="card-title"><FaMobileAlt /> เบอร์โทรและ OTP ในการทดสอบ</h3>
+                        <h3 className="card-title"><FaMobileAlt /> เบอร์โทรและ OTP ในการทดสอบสำหรับไฟล์ APK ส่วนเว็บแอปใส่อะไรก็ได้ครับ</h3>
                         <div className="credential-list">
                             <div className="credential-item">
                                 <div className="credential-group">

@@ -74,50 +74,196 @@
     transform: scale(1.02);
 }
 
-/* QR Code Section */
-.qr-section {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    margin-bottom: 40px;
-    padding: 32px;
-    background: #ffffff;
+/* Testing Options Section */
+.testing-options-section {
+    background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
     border-radius: 16px;
+    padding: 32px;
+    margin-bottom: 40px;
     border: 1px solid var(--border-color);
 }
 
-.qr-code {
-    width: 160px;
-    height: 160px;
+.testing-title {
+    font-size: 20px;
+    font-weight: 700;
+    color: var(--text-primary);
+    text-align: center;
+    margin: 0 0 28px 0;
+}
+
+.testing-options-grid {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 32px;
+    flex-wrap: wrap;
+}
+
+.testing-option {
+    background: #ffffff;
+    border-radius: 16px;
+    padding: 24px;
+    text-align: center;
+    border: 1px solid var(--border-color);
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+    transition: all 0.3s ease;
+    min-width: 220px;
+    max-width: 280px;
+    flex: 1;
+}
+
+.testing-option:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 12px 24px -8px rgba(0, 0, 0, 0.1);
+}
+
+.option-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: #f1f5f9;
+    padding: 8px 16px;
+    border-radius: 50px;
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--text-secondary);
     margin-bottom: 16px;
+}
+
+.badge-icon {
+    font-size: 16px;
+}
+
+.badge-icon.android {
+    color: #10b981;
+}
+
+.badge-icon.web {
+    color: #3b82f6;
+}
+
+.qr-code {
+    width: 140px;
+    height: 140px;
+    margin: 8px 0 16px 0;
     border-radius: 12px;
     border: 4px solid #fff;
     box-shadow: 0 0 0 2px #e2e8f0;
 }
 
-.qr-caption {
+.option-description {
     color: var(--text-secondary);
-    font-size: 15px;
+    font-size: 14px;
     line-height: 1.6;
-    text-align: center;
+    margin: 0 0 12px 0;
 }
 
-.android-icon {
-    color: #10b981;
-    font-size: 20px;
-    vertical-align: middle;
-    margin-right: 6px;
-}
-
-.note {
-    display: inline-block;
-    color: var(--danger-color);
-    font-size: 13px;
+.platform-note {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 12px;
     font-weight: 500;
-    margin-top: 4px;
-    background: #fee2e2;
-    padding: 2px 8px;
-    border-radius: 4px;
+    padding: 4px 12px;
+    border-radius: 50px;
+}
+
+.android-note {
+    background: #d1fae5;
+    color: #059669;
+}
+
+.web-note {
+    background: #dbeafe;
+    color: #2563eb;
+}
+
+/* OR Divider */
+.or-divider {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.or-divider span {
+    background: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-dark) 100%);
+    color: white;
+    padding: 12px 20px;
+    border-radius: 50px;
+    font-size: 14px;
+    font-weight: 700;
+    box-shadow: 0 4px 6px -1px rgba(37, 99, 235, 0.2);
+}
+
+/* Web App Link */
+.web-option-content {
+    padding: 20px 0;
+}
+
+.webapp-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+    color: white;
+    padding: 12px 20px;
+    border-radius: 50px;
+    font-size: 14px;
+    font-weight: 600;
+    text-decoration: none;
+    box-shadow: 0 4px 6px -1px rgba(59, 130, 246, 0.3);
+    transition: all 0.3s ease;
+}
+
+.webapp-link:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 15px -3px rgba(59, 130, 246, 0.4);
+}
+
+/* Testing Notice */
+.testing-notice {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    margin-top: 28px;
+    padding: 16px 24px;
+    background: #fffbeb;
+    border: 1px solid #f9da9d;
+    border-radius: 12px;
+    color: #92400e;
+    font-size: 14px;
+    font-weight: 500;
+}
+
+.notice-icon {
+    font-size: 18px;
+    color: #d97706;
+    flex-shrink: 0;
+}
+
+/* Responsive for Testing Options */
+@media (max-width: 768px) {
+    .testing-options-grid {
+        flex-direction: column;
+        gap: 20px;
+    }
+
+    .testing-option {
+        width: 100%;
+        max-width: 100%;
+    }
+
+    .or-divider span {
+        padding: 10px 16px;
+        font-size: 13px;
+    }
+
+    .testing-notice {
+        flex-direction: column;
+        text-align: center;
+        gap: 8px;
+    }
 }
 
 /* Demo Alert */

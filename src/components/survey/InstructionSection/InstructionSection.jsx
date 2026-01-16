@@ -1,7 +1,7 @@
 // ============================================
 // InstructionSection Component
 // ============================================
-import { FaInfoCircle, FaExclamationTriangle, FaStar, FaAndroid, FaMobileAlt } from 'react-icons/fa';
+import { FaInfoCircle, FaExclamationTriangle, FaStar, FaAndroid, FaMobileAlt, FaGlobe, FaExternalLinkAlt } from 'react-icons/fa';
 import screenImage from '../../../assets/images/screen.png';
 import qrcodeImage from '../../../assets/images/qrcode.jpg';
 import './InstructionSection.css';
@@ -29,17 +29,62 @@ export default function InstructionSection() {
                     </button>
                 </div>
 
-                {/* QR Code Section */}
-                <div className="qr-section">
-                    <img src={qrcodeImage} alt="QR Code for APK" className="qr-code" />
-                    <p className="qr-caption">
-                        <FaAndroid className="android-icon" /> QR Code เพื่อโหลดเป็นไฟล์ APK เพื่อทดสอบการใช้งานระบบ<br />
-                        <span className="note">(ใช้ได้แค่ Android)</span>
-                        <div className="alert-item">
-                            <FaExclamationTriangle className="alert-icon" />
-                            <span>หากไม่ทดสอบหรือทดสอบไม่ได้ สามารถดู UI ข้างบนแทนได้เลยครับ</span>
+                {/* Testing Options Section */}
+                <div className="testing-options-section">
+                    <h3 className="testing-title">ช่องทางทดสอบระบบ</h3>
+
+                    <div className="testing-options-grid">
+                        {/* Option 1: QR Code APK */}
+                        <div className="testing-option">
+                            <div className="option-badge">
+                                <FaAndroid className="badge-icon android" />
+                                <span>APK Download</span>
+                            </div>
+                            <img src={qrcodeImage} alt="QR Code for APK" className="qr-code" />
+                            <p className="option-description">
+                                QR Code เพื่อโหลดเป็นไฟล์ APK<br />เพื่อทดสอบการใช้งานระบบ
+                            </p>
+                            <span className="platform-note android-note">
+                                <FaAndroid /> ใช้ได้แค่ Android
+                            </span>
                         </div>
-                    </p>
+
+                        {/* OR Divider */}
+                        <div className="or-divider">
+                            <span>หรือ</span>
+                        </div>
+
+                        {/* Option 2: Web App */}
+                        <div className="testing-option">
+                            <div className="option-badge">
+                                <FaGlobe className="badge-icon web" />
+                                <span>Web App</span>
+                            </div>
+                            <div className="web-option-content">
+                                <p className="option-description">
+                                    ทดสอบผ่านเว็บแอป
+                                </p>
+                                <a
+                                    href="https://nid-remote-demo.onrender.com/login"
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    className="webapp-link"
+                                >
+                                    <FaExternalLinkAlt />
+                                    <span>nid-remote-demo.onrender.com</span>
+                                </a>
+                            </div>
+                            <span className="platform-note web-note">
+                                <FaGlobe /> ใช้ได้ทุกอุปกรณ์
+                            </span>
+                        </div>
+                    </div>
+
+                    {/* Alert Notice */}
+                    <div className="testing-notice">
+                        <FaExclamationTriangle className="notice-icon" />
+                        <span>หากไม่ทดสอบหรือทดสอบไม่ได้ สามารถดู UI ข้างบนแทนได้เลยครับ</span>
+                    </div>
                 </div>
 
                 <div className="info-grid">
@@ -78,16 +123,6 @@ export default function InstructionSection() {
                                 </div>
                             </div>
                         </div>
-                    </div>
-
-                    {/* Limitations */}
-                    <div className="info-card limitations-card">
-                        <h3 className="card-title">ข้อจำกัดของระบบ Demo</h3>
-                        <ul className="limitations-list">
-                            <li>ดึงมาแค่ภาพจากกล้องวงจรปิด โดยรีโหลดภาพทุกๆ 0.5 วินาที</li>
-                            <li>เนื่องจากเป็น Demo ไม่สามารถใช้ปุ่มเมนูแฮมเบอร์เกอร์ได้</li>
-                            <li>เนื่องจากเป็น Demo เลยไม่ได้พัฒนาในส่วนของตัวเต็มให้ Demo ต่อ</li>
-                        </ul>
                     </div>
                 </div>
 

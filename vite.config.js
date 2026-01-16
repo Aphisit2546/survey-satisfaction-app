@@ -17,10 +17,14 @@ export default defineConfig({
     sourcemap: false, // ปิด sourcemap ใน production
     rollupOptions: {
       output: {
-        manualChunks: {
+        manualChunks(id) {
           // แยก vendor chunks สำหรับ caching ที่ดีขึ้น
-          'react-vendor': ['react', 'react-dom', 'react-router-dom'],
-          'supabase-vendor': ['@supabase/supabase-js'],
+          if (id.includes('node_modules/react') || id.includes('node_modules/react-dom') || id.includes('node_modules/react-router-dom')) {
+            return 'react-vendor';
+          }
+          if (id.includes('node_modules/@supabase/supabase-js')) {
+            return 'supabase-vendor';
+          }
         },
       },
     },

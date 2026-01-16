@@ -34,23 +34,33 @@ export default function InstructionSection() {
                     <h3 className="testing-title">ช่องทางทดสอบระบบ</h3>
 
                     <div className="testing-options-grid">
-                        {/* Option 1: QR Code APK */}
+                        {/* Option 1: APK */}
                         <div className="testing-option">
                             <div className="option-badge">
                                 <FaAndroid className="badge-icon android" />
                                 <span>APK Download</span>
                             </div>
-                            <img src={qrcodeImage} alt="QR Code for APK" className="qr-code" />
-                            <p className="option-description">
-                                QR Code เพื่อโหลดเป็นไฟล์ APK<br />เพื่อทดสอบการใช้งานระบบ
-                            </p>
+                            <div className="web-option-content">
+                                <p className="option-description">
+                                    ทดสอบผ่านโทรศัพท์ Android เท่านั้น
+                                </p>
+                                <a
+                                    href="https://drive.google.com/file/d/1e75lD9VjPA5ixoP9b32eLZkgQ1Jv6Ezc/view"
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    className="webapp-link"
+                                >
+                                    <FaExternalLinkAlt />
+                                    <span>คลิก ดาวน์โหลด APK</span>
+                                </a>
+                            </div>
                             <span className="platform-note android-note">
                                 <FaAndroid /> ใช้ได้แค่ Android
                             </span>
                         </div>
 
                         {/* OR Divider */}
-                        <div className="or-divider">
+                        <div>
                             <span>หรือ</span>
                         </div>
 
@@ -71,7 +81,7 @@ export default function InstructionSection() {
                                     className="webapp-link"
                                 >
                                     <FaExternalLinkAlt />
-                                    <span>nid-remote-demo.onrender.com</span>
+                                    <span>คลิก ทดสอบผ่านเว็บแอป</span>
                                 </a>
                             </div>
                             <span className="platform-note web-note">

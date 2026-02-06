@@ -180,6 +180,15 @@
 .back-button-container {
     margin-top: 40px;
     text-align: center;
+    display: flex;
+    justify-content: center;
+    gap: 12px;
+    flex-wrap: wrap;
+}
+
+.dashboard-content-export {
+    background: #ffffff;
+    padding: 20px;
 }
 
 /* Responsive */
@@ -192,5 +201,10 @@
     .stats-table td {
         padding: 12px;
         font-size: 14px;
+    }
+
+    .back-button-container {
+        flex-direction: column;
+        align-items: center;
     }
 }

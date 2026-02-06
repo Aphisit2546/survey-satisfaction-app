@@ -3,7 +3,7 @@
 // ============================================
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { FaArrowLeft } from 'react-icons/fa';
+import { FaArrowLeft, FaFilePdf } from 'react-icons/fa';
 import { fetchAllResponses } from '../../services/supabaseClient';
 import Button from '../../components/common/Button/Button';
 import {
@@ -12,6 +12,8 @@ import {
     USABILITY_QUESTIONS,
     USEFULNESS_QUESTIONS
 } from '../../utils/constants';
+import jsPDF from 'jspdf';
+import 'jspdf-autotable';
 import './DashboardPage.css';
 
 export default function DashboardPage() {
@@ -19,6 +21,7 @@ export default function DashboardPage() {
     const [loading, setLoading] = useState(true);
     const [stats, setStats] = useState(null);
     const [error, setError] = useState(null);
+    const [exporting, setExporting] = useState(false);
 
     useEffect(() => {
         loadData();
@@ -129,6 +132,183 @@ export default function DashboardPage() {
         if (score >= 2.50) return 'ปานกลาง';
         if (score >= 1.50) return 'น้อย (พอใช้)';
         return 'น้อยที่สุด (ควรปรับปรุง)';
+    };
+
+    const exportToPDF = async () => {
+        if (!stats || stats.total === 0) {
+            alert('ไม่มีข้อมูลสำหรับส่งออก');
+            return;
+        }
+
+        setExporting(true);
+
+        try {
+            // Create PDF document
+            const doc = new jsPDF('p', 'mm', 'a4');
+
+            // Load Thai font (THSarabunNew)
+            const fontUrl = 'https://cdn.jsdelivr.net/npm/@aspect-ratio/thai-fonts@1.0.0/THSarabunNew.ttf';
+
+            try {
+                const response = await fetch(fontUrl);
+                const fontBuffer = await response.arrayBuffer();
+                const fontBase64 = btoa(String.fromCharCode(...new Uint8Array(fontBuffer)));
+                doc.addFileToVFS('THSarabunNew.ttf', fontBase64);
+                doc.addFont('THSarabunNew.ttf', 'THSarabunNew', 'normal');
+                doc.setFont('THSarabunNew');
+            } catch (fontError) {
+                console.warn('Could not load Thai font, using default font');
+            }
+
+            const pageWidth = doc.internal.pageSize.getWidth();
+            let yPosition = 20;
+
+            // Title
+            doc.setFontSize(18);
+            doc.text('ผลการประเมินความพึงพอใจ', pageWidth / 2, yPosition, { align: 'center' });
+            yPosition += 10;
+
+            doc.setFontSize(12);
+            doc.text('ตารางแสดงค่าเฉลี่ย (Mean) และส่วนเบี่ยงเบนมาตรฐาน (S.D.)', pageWidth / 2, yPosition, { align: 'center' });
+            yPosition += 10;
+
+            // Total respondents
+            doc.setFontSize(14);
+            doc.text(`ผู้ตอบแบบสอบถามทั้งหมด: ${stats.total} คน`, 14, yPosition);
+            yPosition += 10;
+
+            // Export Date/Time
+            const now = new Date();
+            const dateStr = now.toLocaleDateString('th-TH', { year: 'numeric', month: 'long', day: 'numeric' });
+            const timeStr = now.toLocaleTimeString('th-TH', { hour: '2-digit', minute: '2-digit' });
+            doc.setFontSize(10);
+            doc.text(`วันที่ส่งออก: ${dateStr} เวลา ${timeStr}`, 14, yPosition);
+            yPosition += 15;
+
+            // Table styling options
+            const tableStyles = {
+                headStyles: {
+                    fillColor: [59, 130, 246],
+                    textColor: 255,
+                    fontSize: 10,
+                    halign: 'center'
+                },
+                bodyStyles: {
+                    fontSize: 9,
+                    textColor: 50
+                },
+                alternateRowStyles: {
+                    fillColor: [245, 247, 250]
+                },
+                columnStyles: {
+                    0: { cellWidth: 'auto' },
+                    1: { cellWidth: 25, halign: 'center' },
+                    2: { cellWidth: 25, halign: 'center' },
+                    3: { cellWidth: 40, halign: 'center' }
+                },
+                margin: { left: 14, right: 14 },
+                tableWidth: 'auto'
+            };
+
+            // Helper function to add a table section
+            const addTableSection = (title, dataObj, summaryLabel) => {
+                // Check if need new page
+                if (yPosition > 240) {
+                    doc.addPage();
+                    yPosition = 20;
+                }
+
+                // Section title
+                doc.setFontSize(12);
+                doc.setTextColor(59, 130, 246);
+                doc.text(title, 14, yPosition);
+                doc.setTextColor(0, 0, 0);
+                yPosition += 5;
+
+                // Prepare table data
+                const tableData = dataObj.items.map((item, idx) => [
+                    `${idx + 1}. ${item.label}`,
+                    item.mean,
+                    item.sd,
+                    getInterpretation(item.mean)
+                ]);
+
+                // Add summary row
+                tableData.push([
+                    `5. ${summaryLabel}`,
+                    dataObj.summary.mean,
+                    dataObj.summary.sd,
+                    getInterpretation(dataObj.summary.mean)
+                ]);
+
+                doc.autoTable({
+                    startY: yPosition,
+                    head: [['หัวข้อการประเมิน', 'Mean', 'S.D.', 'ความหมาย']],
+                    body: tableData,
+                    ...tableStyles,
+                    didParseCell: function (data) {
+                        // Style summary row
+                        if (data.row.index === tableData.length - 1) {
+                            data.cell.styles.fontStyle = 'bold';
+                            data.cell.styles.fillColor = [220, 230, 245];
+                        }
+                    }
+                });
+
+                yPosition = doc.lastAutoTable.finalY + 15;
+            };
+
+            // Add each section
+            addTableSection('ด้านการออกแบบ (Design Aspect)', stats.design, 'ภาพรวมด้านการออกแบบ');
+            addTableSection('ด้านคุณภาพระบบ (System Quality)', stats.quality, 'ภาพรวมด้านคุณภาพระบบ');
+            addTableSection('ด้านการใช้งาน (Usability)', stats.usability, 'ภาพรวมด้านการใช้งาน');
+            addTableSection('ด้านประโยชน์ที่ได้รับ (Usefulness)', stats.usefulness, 'ภาพรวมด้านประโยชน์ที่ได้รับ');
+
+            // Grand Total Summary Table
+            if (yPosition > 200) {
+                doc.addPage();
+                yPosition = 20;
+            }
+
+            doc.setFontSize(12);
+            doc.setTextColor(59, 130, 246);
+            doc.text('สรุปภาพรวมทั้ง 4 ด้าน', 14, yPosition);
+            doc.setTextColor(0, 0, 0);
+            yPosition += 5;
+
+            const grandTotalData = [
+                ['1. ภาพรวมด้านการออกแบบ (Design Aspect)', stats.design.summary.mean, stats.design.summary.sd, getInterpretation(stats.design.summary.mean)],
+                ['2. ภาพรวมด้านคุณภาพระบบ (System Quality)', stats.quality.summary.mean, stats.quality.summary.sd, getInterpretation(stats.quality.summary.mean)],
+                ['3. ภาพรวมด้านการใช้งาน (Usability)', stats.usability.summary.mean, stats.usability.summary.sd, getInterpretation(stats.usability.summary.mean)],
+                ['4. ภาพรวมด้านประโยชน์ที่ได้รับ (Usefulness)', stats.usefulness.summary.mean, stats.usefulness.summary.sd, getInterpretation(stats.usefulness.summary.mean)],
+                ['สรุปภาพรวมระบบทั้งหมด', stats.overall.mean, stats.overall.sd, getInterpretation(stats.overall.mean)]
+            ];
+
+            doc.autoTable({
+                startY: yPosition,
+                head: [['หัวข้อการประเมิน', 'Mean', 'S.D.', 'ความหมาย']],
+                body: grandTotalData,
+                ...tableStyles,
+                didParseCell: function (data) {
+                    // Style grand total row
+                    if (data.row.index === grandTotalData.length - 1) {
+                        data.cell.styles.fontStyle = 'bold';
+                        data.cell.styles.fillColor = [59, 130, 246];
+                        data.cell.styles.textColor = 255;
+                    }
+                }
+            });
+
+            // Save PDF
+            const fileName = `ผลการประเมินความพึงพอใจ_${now.toISOString().split('T')[0]}.pdf`;
+            doc.save(fileName);
+
+        } catch (err) {
+            console.error('Error exporting PDF:', err);
+            alert('เกิดข้อผิดพลาดในการส่งออก PDF');
+        } finally {
+            setExporting(false);
+        }
     };
 
     if (loading) return <div className="loading-container">กำลังโหลดข้อมูล...</div>;
@@ -251,6 +431,17 @@ export default function DashboardPage() {
                 )}
 
                 <div className="back-button-container">
+                    {stats?.total > 0 && (
+                        <Button
+                            variant="primary"
+                            onClick={exportToPDF}
+                            disabled={exporting}
+                            style={{ display: 'flex', alignItems: 'center', gap: '8px' }}
+                        >
+                            <FaFilePdf />
+                            {exporting ? 'กำลังส่งออก...' : 'ส่งออก PDF'}
+                        </Button>
+                    )}
                     <Button variant="secondary" onClick={() => navigate('/')}>
                         กลับหน้าหลัก
                     </Button>

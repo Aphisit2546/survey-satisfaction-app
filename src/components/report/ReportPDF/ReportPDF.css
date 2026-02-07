@@ -1,0 +1,203 @@
+/* ============================================
+   ReportPDF Component Styles
+   Formal Thai Government/University Report Format
+   ============================================ */
+
+/* Import TH Sarabun New Font from Google Fonts */
+@import url('https://fonts.googleapis.com/css2?family=Sarabun:wght@400;600;700&display=swap');
+
+/* A4 Paper Size: 210mm x 297mm */
+.report-pdf-container {
+    width: 210mm;
+    min-height: 297mm;
+    padding: 20mm 25mm;
+    background-color: #ffffff;
+    font-family: 'Sarabun', 'TH Sarabun New', 'Tahoma', sans-serif;
+    font-size: 16px;
+    line-height: 1.6;
+    color: #333333;
+    box-sizing: border-box;
+}
+
+/* ============================================
+   Document Header
+   ============================================ */
+.report-header {
+    text-align: center;
+    margin-bottom: 24px;
+    padding-bottom: 20px;
+    border-bottom: 2px solid #003366;
+}
+
+.report-main-title {
+    font-size: 24px;
+    font-weight: 700;
+    color: #003366;
+    margin: 0 0 8px 0;
+    letter-spacing: 0.5px;
+}
+
+.report-subtitle {
+    font-size: 16px;
+    color: #666666;
+    margin: 0 0 16px 0;
+}
+
+.report-info {
+    text-align: left;
+    background-color: #f8f9fa;
+    padding: 12px 16px;
+    border-radius: 4px;
+    border-left: 4px solid #003366;
+}
+
+.report-info p {
+    margin: 4px 0;
+    font-size: 15px;
+}
+
+/* ============================================
+   Table Sections
+   ============================================ */
+.report-content {
+    margin-bottom: 20px;
+}
+
+.report-table-section {
+    margin-bottom: 24px;
+    page-break-inside: avoid;
+}
+
+.report-table-title {
+    font-size: 18px;
+    font-weight: 700;
+    color: #003366;
+    margin: 0 0 12px 0;
+    padding-left: 12px;
+    border-left: 4px solid #003366;
+}
+
+/* ============================================
+   Table Styles
+   ============================================ */
+.report-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 14px;
+    margin-bottom: 8px;
+}
+
+.report-table th,
+.report-table td {
+    border: 1px solid #666666;
+    padding: 8px 10px;
+    vertical-align: middle;
+}
+
+.report-table thead th {
+    background-color: #e8e8e8;
+    font-weight: 700;
+    color: #333333;
+    text-align: center;
+}
+
+.report-table tbody td {
+    background-color: #ffffff;
+}
+
+.report-table tbody tr:nth-child(even) td {
+    background-color: #fafafa;
+}
+
+/* Column Widths */
+.col-no {
+    width: 50px;
+    text-align: center;
+}
+
+.col-topic {
+    width: auto;
+}
+
+.col-mean,
+.col-sd {
+    width: 80px;
+    text-align: center;
+}
+
+.col-meaning {
+    width: 120px;
+    text-align: center;
+}
+
+/* Center aligned cells */
+.report-table .center {
+    text-align: center;
+}
+
+/* Summary Row */
+.report-table .summary-row td {
+    background-color: #e3f2fd !important;
+    font-weight: 600;
+}
+
+/* Grand Total Row */
+.report-table .grand-total-row td {
+    background-color: #c8e6c9 !important;
+    font-weight: 700;
+    color: #1b5e20;
+}
+
+/* ============================================
+   Footer
+   ============================================ */
+.report-footer {
+    margin-top: 24px;
+    padding-top: 16px;
+    border-top: 1px solid #cccccc;
+    text-align: center;
+}
+
+.report-footer p {
+    font-size: 14px;
+    color: #666666;
+    margin: 0;
+}
+
+/* ============================================
+   Print Styles
+   ============================================ */
+@media print {
+    .report-pdf-container {
+        width: 100%;
+        padding: 15mm 20mm;
+        box-shadow: none;
+    }
+
+    .report-table-section {
+        page-break-inside: avoid;
+    }
+
+    .report-table {
+        page-break-inside: avoid;
+    }
+
+    .report-table tr {
+        page-break-inside: avoid;
+    }
+}
+
+/* ============================================
+   Hidden Report Container (for export)
+   ============================================ */
+.report-hidden-container {
+    position: absolute;
+    left: -9999px;
+    top: 0;
+    visibility: hidden;
+    pointer-events: none;
+}
+
+.report-hidden-container .report-pdf-container {
+    visibility: visible;
+}

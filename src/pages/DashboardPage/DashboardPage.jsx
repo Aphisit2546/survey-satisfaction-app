@@ -3,7 +3,7 @@
 // ============================================
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { FaFilePdf, FaImage, FaTimes, FaDownload, FaCheckCircle } from 'react-icons/fa';
+import { FaFilePdf, FaTimes, FaDownload, FaCheckCircle } from 'react-icons/fa';
 import { fetchAllResponses } from '../../services/supabaseClient';
 import Button from '../../components/common/Button/Button';
 import {
@@ -13,7 +13,33 @@ import {
     USEFULNESS_QUESTIONS
 } from '../../utils/constants';
 import jsPDF from 'jspdf';
+import html2canvas from 'html2canvas';
+import {
+    Chart as ChartJS,
+    ArcElement,
+    CategoryScale,
+    LinearScale,
+    BarElement,
+    Title,
+    Tooltip,
+    Legend
+} from 'chart.js';
+import { Pie, Bar } from 'react-chartjs-2';
+import ChartDataLabels from 'chartjs-plugin-datalabels';
+import ReportPDF from '../../components/report/ReportPDF/ReportPDF';
 import './DashboardPage.css';
+
+// Register Chart.js components
+ChartJS.register(
+    ArcElement,
+    CategoryScale,
+    LinearScale,
+    BarElement,
+    Title,
+    Tooltip,
+    Legend,
+    ChartDataLabels
+);
 
 export default function DashboardPage() {
     const navigate = useNavigate();
@@ -136,146 +162,8 @@ export default function DashboardPage() {
         return 'น้อยที่สุด (ควรปรับปรุง)';
     };
 
-    const getInterpretationEN = (mean) => {
-        const score = parseFloat(mean);
-        if (score >= 4.50) return 'Excellent';
-        if (score >= 3.50) return 'Good';
-        if (score >= 2.50) return 'Fair';
-        if (score >= 1.50) return 'Poor';
-        return 'Very Poor';
-    };
-
-    // Helper function to create export canvas with survey data
-    const createExportCanvas = () => {
-        const canvas = document.createElement('canvas');
-        const width = 1200;
-        const height = 1600;
-        canvas.width = width;
-        canvas.height = height;
-        const ctx = canvas.getContext('2d');
-
-        // Background
-        ctx.fillStyle = '#ffffff';
-        ctx.fillRect(0, 0, width, height);
-
-        // Header gradient
-        const headerGradient = ctx.createLinearGradient(0, 0, width, 200);
-        headerGradient.addColorStop(0, '#667eea');
-        headerGradient.addColorStop(1, '#764ba2');
-        ctx.fillStyle = headerGradient;
-        ctx.fillRect(0, 0, width, 180);
-
-        // Title
-        ctx.fillStyle = '#ffffff';
-        ctx.font = 'bold 36px system-ui, -apple-system, sans-serif';
-        ctx.textAlign = 'center';
-        ctx.fillText('ผลการประเมินความพึงพอใจ', width / 2, 70);
-
-        ctx.font = '20px system-ui, -apple-system, sans-serif';
-        ctx.fillText('Survey Satisfaction Results', width / 2, 105);
-
-        // Total respondents
-        ctx.font = 'bold 28px system-ui, -apple-system, sans-serif';
-        ctx.fillText(`ผู้ตอบแบบสอบถามทั้งหมด: ${stats?.total || 0} คน`, width / 2, 155);
-
-        // Categories data
-        const categories = [
-            { title: 'ด้านการออกแบบ (Design)', data: stats?.design, color: '#3b82f6' },
-            { title: 'ด้านคุณภาพระบบ (Quality)', data: stats?.quality, color: '#10b981' },
-            { title: 'ด้านการใช้งาน (Usability)', data: stats?.usability, color: '#f59e0b' },
-            { title: 'ด้านประโยชน์ (Usefulness)', data: stats?.usefulness, color: '#ef4444' }
-        ];
-
-        let yPos = 230;
-
-        categories.forEach((category, catIndex) => {
-            // Category header
-            ctx.fillStyle = category.color;
-            ctx.fillRect(40, yPos, 8, 30);
-            ctx.fillStyle = '#1e293b';
-            ctx.font = 'bold 22px system-ui, -apple-system, sans-serif';
-            ctx.textAlign = 'left';
-            ctx.fillText(category.title, 60, yPos + 22);
-            yPos += 50;
-
-            // Table header
-            ctx.fillStyle = '#f1f5f9';
-            ctx.fillRect(40, yPos, width - 80, 35);
-            ctx.fillStyle = '#475569';
-            ctx.font = '14px system-ui, -apple-system, sans-serif';
-            ctx.textAlign = 'left';
-            ctx.fillText('หัวข้อการประเมิน', 55, yPos + 23);
-            ctx.textAlign = 'center';
-            ctx.fillText('Mean', width - 280, yPos + 23);
-            ctx.fillText('S.D.', width - 180, yPos + 23);
-            ctx.fillText('ความหมาย', width - 80, yPos + 23);
-            yPos += 35;
-
-            // Draw items
-            category.data?.items?.forEach((item, idx) => {
-                if (idx % 2 === 0) {
-                    ctx.fillStyle = '#fafafa';
-                    ctx.fillRect(40, yPos, width - 80, 28);
-                }
-                ctx.fillStyle = '#64748b';
-                ctx.font = '13px system-ui, -apple-system, sans-serif';
-                ctx.textAlign = 'left';
-                const truncatedLabel = item.label.length > 50 ? item.label.substring(0, 50) + '...' : item.label;
-                ctx.fillText(`${idx + 1}. ${truncatedLabel}`, 55, yPos + 18);
-                ctx.textAlign = 'center';
-                ctx.fillText(item.mean, width - 280, yPos + 18);
-                ctx.fillText(item.sd, width - 180, yPos + 18);
-                ctx.font = '12px system-ui, -apple-system, sans-serif';
-                ctx.fillText(getInterpretation(item.mean), width - 80, yPos + 18);
-                yPos += 28;
-            });
-
-            // Summary row
-            ctx.fillStyle = '#e2e8f0';
-            ctx.fillRect(40, yPos, width - 80, 32);
-            ctx.fillStyle = '#1e293b';
-            ctx.font = 'bold 14px system-ui, -apple-system, sans-serif';
-            ctx.textAlign = 'left';
-            ctx.fillText(`รวม${category.title}`, 55, yPos + 21);
-            ctx.textAlign = 'center';
-            ctx.fillText(category.data?.summary?.mean, width - 280, yPos + 21);
-            ctx.fillText(category.data?.summary?.sd, width - 180, yPos + 21);
-            ctx.font = 'bold 13px system-ui, -apple-system, sans-serif';
-            ctx.fillText(getInterpretation(category.data?.summary?.mean), width - 80, yPos + 21);
-            yPos += 50;
-        });
-
-        // Overall summary box
-        const overallGradient = ctx.createLinearGradient(40, yPos, width - 40, yPos + 100);
-        overallGradient.addColorStop(0, '#667eea');
-        overallGradient.addColorStop(1, '#764ba2');
-        ctx.fillStyle = overallGradient;
-        ctx.roundRect(40, yPos, width - 80, 100, 16);
-        ctx.fill();
-
-        ctx.fillStyle = '#ffffff';
-        ctx.font = 'bold 24px system-ui, -apple-system, sans-serif';
-        ctx.textAlign = 'center';
-        ctx.fillText('สรุปภาพรวมระบบทั้งหมด', width / 2, yPos + 35);
-
-        ctx.font = 'bold 48px system-ui, -apple-system, sans-serif';
-        ctx.fillText(`${stats?.overall?.mean || '0.00'}`, width / 2 - 100, yPos + 75);
-
-        ctx.font = '18px system-ui, -apple-system, sans-serif';
-        ctx.fillText(`(${getInterpretation(stats?.overall?.mean)})`, width / 2 + 100, yPos + 75);
-
-        // Footer
-        yPos += 120;
-        ctx.fillStyle = '#94a3b8';
-        ctx.font = '14px system-ui, -apple-system, sans-serif';
-        ctx.textAlign = 'center';
-        const now = new Date();
-        ctx.fillText(`รายงานสร้างเมื่อ: ${now.toLocaleDateString('th-TH')} ${now.toLocaleTimeString('th-TH')}`, width / 2, yPos);
-
-        return canvas;
-    };
-
-    const exportToPDF = async () => {
+    // Export Official PDF Report using html2canvas
+    const exportOfficialPDF = async () => {
         if (!stats || stats.total === 0) {
             alert('ไม่มีข้อมูลสำหรับส่งออก');
             return;
@@ -285,30 +173,48 @@ export default function DashboardPage() {
         setExportStatus('pdf');
 
         try {
-            const canvas = createExportCanvas();
+            const reportElement = document.getElementById('report-pdf-content');
+            if (!reportElement) {
+                throw new Error('Report element not found');
+            }
+
+            // Use html2canvas with high resolution
+            const canvas = await html2canvas(reportElement, {
+                scale: 3,
+                backgroundColor: '#ffffff',
+                useCORS: true,
+                allowTaint: true,
+                logging: false
+            });
+
             const imgData = canvas.toDataURL('image/png');
 
-            // Create PDF
+            // Create PDF with A4 size
             const pdf = new jsPDF('p', 'mm', 'a4');
             const pageWidth = pdf.internal.pageSize.getWidth();
             const pageHeight = pdf.internal.pageSize.getHeight();
 
-            // Calculate dimensions to fit the image
+            // Calculate dimensions to fit the image on A4
             const imgWidth = pageWidth - 20; // 10mm margin on each side
             const imgHeight = (canvas.height * imgWidth) / canvas.width;
 
-            // If image is taller than one page, scale to fit
-            if (imgHeight > pageHeight - 20) {
-                const scaledHeight = pageHeight - 20;
-                const scaledWidth = (canvas.width * scaledHeight) / canvas.height;
-                pdf.addImage(imgData, 'PNG', (pageWidth - scaledWidth) / 2, 10, scaledWidth, scaledHeight);
+            // Handle multi-page if content is taller than one page
+            let yPos = 10;
+            const maxHeight = pageHeight - 20;
+
+            if (imgHeight <= maxHeight) {
+                // Single page
+                pdf.addImage(imgData, 'PNG', 10, yPos, imgWidth, imgHeight);
             } else {
-                pdf.addImage(imgData, 'PNG', 10, 10, imgWidth, imgHeight);
+                // Scale to fit one page
+                const scaledHeight = maxHeight;
+                const scaledWidth = (canvas.width * scaledHeight) / canvas.height;
+                pdf.addImage(imgData, 'PNG', (pageWidth - scaledWidth) / 2, yPos, scaledWidth, scaledHeight);
             }
 
             // Save PDF
             const now = new Date();
-            const fileName = `Survey_Results_${now.toISOString().split('T')[0]}.pdf`;
+            const fileName = `Survey_Official_Report_${now.toISOString().split('T')[0]}.pdf`;
             pdf.save(fileName);
 
             setExportStatus('complete');
@@ -317,42 +223,8 @@ export default function DashboardPage() {
             }, 2000);
 
         } catch (err) {
-            console.error('Error exporting PDF:', err);
-            alert('เกิดข้อผิดพลาดในการส่งออก PDF: ' + err.message);
-            setExportStatus(null);
-        } finally {
-            setExporting(false);
-        }
-    };
-
-    const exportToImage = async () => {
-        if (!stats || stats.total === 0) {
-            alert('ไม่มีข้อมูลสำหรับส่งออก');
-            return;
-        }
-
-        setExporting(true);
-        setExportStatus('image');
-
-        try {
-            const canvas = createExportCanvas();
-            const imgData = canvas.toDataURL('image/png');
-
-            // Create download link
-            const link = document.createElement('a');
-            const now = new Date();
-            link.download = `Survey_Results_${now.toISOString().split('T')[0]}.png`;
-            link.href = imgData;
-            link.click();
-
-            setExportStatus('complete');
-            setTimeout(() => {
-                setExportStatus(null);
-            }, 2000);
-
-        } catch (err) {
-            console.error('Error exporting image:', err);
-            alert('เกิดข้อผิดพลาดในการส่งออกรูปภาพ: ' + err.message);
+            console.error('Error exporting official PDF:', err);
+            alert('เกิดข้อผิดพลาดในการส่งออกรายงานทางการ: ' + err.message);
             setExportStatus(null);
         } finally {
             setExporting(false);
@@ -437,19 +309,11 @@ export default function DashboardPage() {
                     <div className="export-modal-footer">
                         <Button
                             variant="primary"
-                            onClick={exportToPDF}
+                            onClick={exportOfficialPDF}
                             disabled={exporting}
-                            style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px' }}
+                            style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px', backgroundColor: '#003366' }}
                         >
-                            <FaFilePdf /> PDF
-                        </Button>
-                        <Button
-                            variant="primary"
-                            onClick={exportToImage}
-                            disabled={exporting}
-                            style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px', backgroundColor: '#10b981' }}
-                        >
-                            <FaImage /> รูปภาพ
+                            <FaFilePdf /> ดาวน์โหลด PDF
                         </Button>
                     </div>
                 </div>
@@ -517,6 +381,205 @@ export default function DashboardPage() {
                             <div className="stat-label">ผู้ตอบแบบสอบถามทั้งหมด</div>
                         </div>
                     </div>
+
+                    {/* Charts Section */}
+                    {stats?.total > 0 && (
+                        <section className="charts-section">
+                            <h2 className="aspect-title">แผนภูมิสรุปผลการประเมิน</h2>
+                            <div className="charts-container">
+                                {/* Bar Chart */}
+                                <div className="chart-card">
+                                    <h3 className="chart-title">แผนภูมิแท่งแสดงค่าเฉลี่ยความพึงพอใจแต่ละด้าน</h3>
+                                    <div className="chart-wrapper">
+                                        <Bar
+                                            data={{
+                                                labels: ['ด้านการออกแบบ', 'ด้านคุณภาพระบบ', 'ด้านการใช้งาน', 'ด้านประโยชน์'],
+                                                datasets: [{
+                                                    label: 'ค่าเฉลี่ย (Mean)',
+                                                    data: [
+                                                        parseFloat(stats?.design?.summary?.mean || 0),
+                                                        parseFloat(stats?.quality?.summary?.mean || 0),
+                                                        parseFloat(stats?.usability?.summary?.mean || 0),
+                                                        parseFloat(stats?.usefulness?.summary?.mean || 0)
+                                                    ],
+                                                    backgroundColor: 'rgba(59, 130, 246, 0.7)',
+                                                    borderColor: 'rgb(59, 130, 246)',
+                                                    borderWidth: 1,
+                                                    borderRadius: 4,
+                                                    barThickness: 50
+                                                }]
+                                            }}
+                                            options={{
+                                                responsive: true,
+                                                maintainAspectRatio: false,
+                                                plugins: {
+                                                    legend: {
+                                                        display: true,
+                                                        position: 'top',
+                                                        align: 'end',
+                                                        labels: {
+                                                            boxWidth: 12,
+                                                            padding: 15,
+                                                            font: {
+                                                                size: 12
+                                                            }
+                                                        }
+                                                    },
+                                                    title: {
+                                                        display: false
+                                                    },
+                                                    tooltip: {
+                                                        backgroundColor: 'rgba(0, 0, 0, 0.8)',
+                                                        titleFont: { size: 13 },
+                                                        bodyFont: { size: 12 },
+                                                        padding: 10,
+                                                        callbacks: {
+                                                            label: (context) => `ค่าเฉลี่ย: ${context.raw.toFixed(2)} คะแนน`
+                                                        }
+                                                    },
+                                                    datalabels: {
+                                                        anchor: 'end',
+                                                        align: 'top',
+                                                        offset: 4,
+                                                        color: '#374151',
+                                                        font: {
+                                                            weight: '600',
+                                                            size: 13
+                                                        },
+                                                        formatter: (value) => value.toFixed(2)
+                                                    }
+                                                },
+                                                scales: {
+                                                    x: {
+                                                        grid: {
+                                                            display: false
+                                                        },
+                                                        ticks: {
+                                                            font: {
+                                                                size: 11
+                                                            },
+                                                            color: '#4b5563'
+                                                        }
+                                                    },
+                                                    y: {
+                                                        beginAtZero: true,
+                                                        max: 5,
+                                                        ticks: {
+                                                            stepSize: 1,
+                                                            font: {
+                                                                size: 11
+                                                            },
+                                                            color: '#4b5563'
+                                                        },
+                                                        grid: {
+                                                            color: '#e5e7eb',
+                                                            drawBorder: false
+                                                        },
+                                                        title: {
+                                                            display: true,
+                                                            text: 'คะแนนเฉลี่ย (1-5)',
+                                                            font: {
+                                                                size: 12,
+                                                                weight: '500'
+                                                            },
+                                                            color: '#374151'
+                                                        }
+                                                    }
+                                                }
+                                            }}
+                                        />
+                                    </div>
+                                </div>
+
+                                {/* Pie Chart */}
+                                <div className="chart-card">
+                                    <h3 className="chart-title">แผนภูมิวงกลมแสดงสัดส่วนคะแนนแต่ละด้าน</h3>
+                                    <div className="chart-wrapper">
+                                        <Pie
+                                            data={{
+                                                labels: ['ด้านการออกแบบ', 'ด้านคุณภาพระบบ', 'ด้านการใช้งาน', 'ด้านประโยชน์'],
+                                                datasets: [{
+                                                    data: [
+                                                        parseFloat(stats?.design?.summary?.mean || 0),
+                                                        parseFloat(stats?.quality?.summary?.mean || 0),
+                                                        parseFloat(stats?.usability?.summary?.mean || 0),
+                                                        parseFloat(stats?.usefulness?.summary?.mean || 0)
+                                                    ],
+                                                    backgroundColor: [
+                                                        'rgba(59, 130, 246, 0.85)',
+                                                        'rgba(34, 197, 94, 0.85)',
+                                                        'rgba(249, 115, 22, 0.85)',
+                                                        'rgba(168, 85, 247, 0.85)'
+                                                    ],
+                                                    borderColor: [
+                                                        'rgb(59, 130, 246)',
+                                                        'rgb(34, 197, 94)',
+                                                        'rgb(249, 115, 22)',
+                                                        'rgb(168, 85, 247)'
+                                                    ],
+                                                    borderWidth: 2,
+                                                    hoverOffset: 8
+                                                }]
+                                            }}
+                                            options={{
+                                                responsive: true,
+                                                maintainAspectRatio: false,
+                                                layout: {
+                                                    padding: {
+                                                        top: 10,
+                                                        bottom: 10
+                                                    }
+                                                },
+                                                plugins: {
+                                                    legend: {
+                                                        position: 'right',
+                                                        align: 'center',
+                                                        labels: {
+                                                            boxWidth: 14,
+                                                            padding: 16,
+                                                            font: {
+                                                                size: 12
+                                                            },
+                                                            usePointStyle: true,
+                                                            pointStyle: 'rectRounded'
+                                                        }
+                                                    },
+                                                    tooltip: {
+                                                        backgroundColor: 'rgba(0, 0, 0, 0.8)',
+                                                        titleFont: { size: 13 },
+                                                        bodyFont: { size: 12 },
+                                                        padding: 10,
+                                                        callbacks: {
+                                                            label: (context) => {
+                                                                const label = context.label || '';
+                                                                const value = context.raw.toFixed(2);
+                                                                const total = context.dataset.data.reduce((a, b) => a + b, 0);
+                                                                const percentage = ((context.raw / total) * 100).toFixed(1);
+                                                                return `${label}: ${value} (${percentage}%)`;
+                                                            }
+                                                        }
+                                                    },
+                                                    datalabels: {
+                                                        color: '#ffffff',
+                                                        font: {
+                                                            weight: '600',
+                                                            size: 12
+                                                        },
+                                                        formatter: (value, context) => {
+                                                            const total = context.dataset.data.reduce((a, b) => a + b, 0);
+                                                            const percentage = ((value / total) * 100).toFixed(0);
+                                                            return `${value.toFixed(2)}\n(${percentage}%)`;
+                                                        },
+                                                        textAlign: 'center'
+                                                    }
+                                                }
+                                            }}
+                                        />
+                                    </div>
+                                </div>
+                            </div>
+                        </section>
+                    )}
 
                     {stats?.total > 0 ? (
                         <>
@@ -597,6 +660,13 @@ export default function DashboardPage() {
 
                 {/* Export Modal */}
                 <ExportModal />
+
+                {/* Hidden ReportPDF for export */}
+                {stats?.total > 0 && (
+                    <div className="report-hidden-container">
+                        <ReportPDF stats={stats} getInterpretation={getInterpretation} />
+                    </div>
+                )}
             </div>
         </div>
     );

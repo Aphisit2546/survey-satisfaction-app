@@ -1,9 +1,9 @@
 // ============================================
 // DashboardPage Component
 // ============================================
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { FaArrowLeft, FaFilePdf, FaImage } from 'react-icons/fa';
+import { FaFilePdf, FaImage, FaTimes, FaDownload, FaCheckCircle } from 'react-icons/fa';
 import { fetchAllResponses } from '../../services/supabaseClient';
 import Button from '../../components/common/Button/Button';
 import {
@@ -12,7 +12,6 @@ import {
     USABILITY_QUESTIONS,
     USEFULNESS_QUESTIONS
 } from '../../utils/constants';
-import html2canvas from 'html2canvas';
 import jsPDF from 'jspdf';
 import './DashboardPage.css';
 
@@ -22,7 +21,9 @@ export default function DashboardPage() {
     const [stats, setStats] = useState(null);
     const [error, setError] = useState(null);
     const [exporting, setExporting] = useState(false);
-    const contentRef = useRef(null);
+    const [showExportModal, setShowExportModal] = useState(false);
+    const [exportStatus, setExportStatus] = useState(null); // 'pdf' | 'image' | 'complete'
+
 
     useEffect(() => {
         loadData();
@@ -144,30 +145,147 @@ export default function DashboardPage() {
         return 'Very Poor';
     };
 
+    // Helper function to create export canvas with survey data
+    const createExportCanvas = () => {
+        const canvas = document.createElement('canvas');
+        const width = 1200;
+        const height = 1600;
+        canvas.width = width;
+        canvas.height = height;
+        const ctx = canvas.getContext('2d');
+
+        // Background
+        ctx.fillStyle = '#ffffff';
+        ctx.fillRect(0, 0, width, height);
+
+        // Header gradient
+        const headerGradient = ctx.createLinearGradient(0, 0, width, 200);
+        headerGradient.addColorStop(0, '#667eea');
+        headerGradient.addColorStop(1, '#764ba2');
+        ctx.fillStyle = headerGradient;
+        ctx.fillRect(0, 0, width, 180);
+
+        // Title
+        ctx.fillStyle = '#ffffff';
+        ctx.font = 'bold 36px system-ui, -apple-system, sans-serif';
+        ctx.textAlign = 'center';
+        ctx.fillText('ผลการประเมินความพึงพอใจ', width / 2, 70);
+
+        ctx.font = '20px system-ui, -apple-system, sans-serif';
+        ctx.fillText('Survey Satisfaction Results', width / 2, 105);
+
+        // Total respondents
+        ctx.font = 'bold 28px system-ui, -apple-system, sans-serif';
+        ctx.fillText(`ผู้ตอบแบบสอบถามทั้งหมด: ${stats?.total || 0} คน`, width / 2, 155);
+
+        // Categories data
+        const categories = [
+            { title: 'ด้านการออกแบบ (Design)', data: stats?.design, color: '#3b82f6' },
+            { title: 'ด้านคุณภาพระบบ (Quality)', data: stats?.quality, color: '#10b981' },
+            { title: 'ด้านการใช้งาน (Usability)', data: stats?.usability, color: '#f59e0b' },
+            { title: 'ด้านประโยชน์ (Usefulness)', data: stats?.usefulness, color: '#ef4444' }
+        ];
+
+        let yPos = 230;
+
+        categories.forEach((category, catIndex) => {
+            // Category header
+            ctx.fillStyle = category.color;
+            ctx.fillRect(40, yPos, 8, 30);
+            ctx.fillStyle = '#1e293b';
+            ctx.font = 'bold 22px system-ui, -apple-system, sans-serif';
+            ctx.textAlign = 'left';
+            ctx.fillText(category.title, 60, yPos + 22);
+            yPos += 50;
+
+            // Table header
+            ctx.fillStyle = '#f1f5f9';
+            ctx.fillRect(40, yPos, width - 80, 35);
+            ctx.fillStyle = '#475569';
+            ctx.font = '14px system-ui, -apple-system, sans-serif';
+            ctx.textAlign = 'left';
+            ctx.fillText('หัวข้อการประเมิน', 55, yPos + 23);
+            ctx.textAlign = 'center';
+            ctx.fillText('Mean', width - 280, yPos + 23);
+            ctx.fillText('S.D.', width - 180, yPos + 23);
+            ctx.fillText('ความหมาย', width - 80, yPos + 23);
+            yPos += 35;
+
+            // Draw items
+            category.data?.items?.forEach((item, idx) => {
+                if (idx % 2 === 0) {
+                    ctx.fillStyle = '#fafafa';
+                    ctx.fillRect(40, yPos, width - 80, 28);
+                }
+                ctx.fillStyle = '#64748b';
+                ctx.font = '13px system-ui, -apple-system, sans-serif';
+                ctx.textAlign = 'left';
+                const truncatedLabel = item.label.length > 50 ? item.label.substring(0, 50) + '...' : item.label;
+                ctx.fillText(`${idx + 1}. ${truncatedLabel}`, 55, yPos + 18);
+                ctx.textAlign = 'center';
+                ctx.fillText(item.mean, width - 280, yPos + 18);
+                ctx.fillText(item.sd, width - 180, yPos + 18);
+                ctx.font = '12px system-ui, -apple-system, sans-serif';
+                ctx.fillText(getInterpretation(item.mean), width - 80, yPos + 18);
+                yPos += 28;
+            });
+
+            // Summary row
+            ctx.fillStyle = '#e2e8f0';
+            ctx.fillRect(40, yPos, width - 80, 32);
+            ctx.fillStyle = '#1e293b';
+            ctx.font = 'bold 14px system-ui, -apple-system, sans-serif';
+            ctx.textAlign = 'left';
+            ctx.fillText(`รวม${category.title}`, 55, yPos + 21);
+            ctx.textAlign = 'center';
+            ctx.fillText(category.data?.summary?.mean, width - 280, yPos + 21);
+            ctx.fillText(category.data?.summary?.sd, width - 180, yPos + 21);
+            ctx.font = 'bold 13px system-ui, -apple-system, sans-serif';
+            ctx.fillText(getInterpretation(category.data?.summary?.mean), width - 80, yPos + 21);
+            yPos += 50;
+        });
+
+        // Overall summary box
+        const overallGradient = ctx.createLinearGradient(40, yPos, width - 40, yPos + 100);
+        overallGradient.addColorStop(0, '#667eea');
+        overallGradient.addColorStop(1, '#764ba2');
+        ctx.fillStyle = overallGradient;
+        ctx.roundRect(40, yPos, width - 80, 100, 16);
+        ctx.fill();
+
+        ctx.fillStyle = '#ffffff';
+        ctx.font = 'bold 24px system-ui, -apple-system, sans-serif';
+        ctx.textAlign = 'center';
+        ctx.fillText('สรุปภาพรวมระบบทั้งหมด', width / 2, yPos + 35);
+
+        ctx.font = 'bold 48px system-ui, -apple-system, sans-serif';
+        ctx.fillText(`${stats?.overall?.mean || '0.00'}`, width / 2 - 100, yPos + 75);
+
+        ctx.font = '18px system-ui, -apple-system, sans-serif';
+        ctx.fillText(`(${getInterpretation(stats?.overall?.mean)})`, width / 2 + 100, yPos + 75);
+
+        // Footer
+        yPos += 120;
+        ctx.fillStyle = '#94a3b8';
+        ctx.font = '14px system-ui, -apple-system, sans-serif';
+        ctx.textAlign = 'center';
+        const now = new Date();
+        ctx.fillText(`รายงานสร้างเมื่อ: ${now.toLocaleDateString('th-TH')} ${now.toLocaleTimeString('th-TH')}`, width / 2, yPos);
+
+        return canvas;
+    };
+
     const exportToPDF = async () => {
         if (!stats || stats.total === 0) {
             alert('ไม่มีข้อมูลสำหรับส่งออก');
             return;
         }
 
-        if (!contentRef.current) {
-            alert('ไม่พบเนื้อหาสำหรับส่งออก');
-            return;
-        }
-
         setExporting(true);
+        setExportStatus('pdf');
 
         try {
-            const element = contentRef.current;
-
-            // Capture the element as canvas
-            const canvas = await html2canvas(element, {
-                scale: 2,
-                useCORS: true,
-                logging: false,
-                backgroundColor: '#ffffff'
-            });
-
+            const canvas = createExportCanvas();
             const imgData = canvas.toDataURL('image/png');
 
             // Create PDF
@@ -179,43 +297,13 @@ export default function DashboardPage() {
             const imgWidth = pageWidth - 20; // 10mm margin on each side
             const imgHeight = (canvas.height * imgWidth) / canvas.width;
 
-            let yPosition = 10;
-
-            // If image is taller than one page, we need to split it
+            // If image is taller than one page, scale to fit
             if (imgHeight > pageHeight - 20) {
-                // Scale to fit width and use multiple pages if needed
                 const scaledHeight = pageHeight - 20;
                 const scaledWidth = (canvas.width * scaledHeight) / canvas.height;
-
-                if (scaledWidth <= pageWidth - 20) {
-                    // Image can fit on one page with height constraint
-                    pdf.addImage(imgData, 'PNG', (pageWidth - scaledWidth) / 2, 10, scaledWidth, scaledHeight);
-                } else {
-                    // Use original width-based scaling and split across pages
-                    const pagesNeeded = Math.ceil(imgHeight / (pageHeight - 20));
-
-                    for (let i = 0; i < pagesNeeded; i++) {
-                        if (i > 0) pdf.addPage();
-
-                        const sourceY = i * ((canvas.height / pagesNeeded));
-                        const sourceHeight = canvas.height / pagesNeeded;
-
-                        // Create a temporary canvas for this portion
-                        const tempCanvas = document.createElement('canvas');
-                        tempCanvas.width = canvas.width;
-                        tempCanvas.height = sourceHeight;
-                        const ctx = tempCanvas.getContext('2d');
-                        ctx.drawImage(canvas, 0, sourceY, canvas.width, sourceHeight, 0, 0, canvas.width, sourceHeight);
-
-                        const portionData = tempCanvas.toDataURL('image/png');
-                        const portionHeight = (sourceHeight * imgWidth) / canvas.width;
-
-                        pdf.addImage(portionData, 'PNG', 10, 10, imgWidth, portionHeight);
-                    }
-                }
+                pdf.addImage(imgData, 'PNG', (pageWidth - scaledWidth) / 2, 10, scaledWidth, scaledHeight);
             } else {
-                // Image fits on one page
-                pdf.addImage(imgData, 'PNG', 10, yPosition, imgWidth, imgHeight);
+                pdf.addImage(imgData, 'PNG', 10, 10, imgWidth, imgHeight);
             }
 
             // Save PDF
@@ -223,9 +311,15 @@ export default function DashboardPage() {
             const fileName = `Survey_Results_${now.toISOString().split('T')[0]}.pdf`;
             pdf.save(fileName);
 
+            setExportStatus('complete');
+            setTimeout(() => {
+                setExportStatus(null);
+            }, 2000);
+
         } catch (err) {
             console.error('Error exporting PDF:', err);
             alert('เกิดข้อผิดพลาดในการส่งออก PDF: ' + err.message);
+            setExportStatus(null);
         } finally {
             setExporting(false);
         }
@@ -237,25 +331,11 @@ export default function DashboardPage() {
             return;
         }
 
-        if (!contentRef.current) {
-            alert('ไม่พบเนื้อหาสำหรับส่งออก');
-            return;
-        }
-
         setExporting(true);
+        setExportStatus('image');
 
         try {
-            const element = contentRef.current;
-
-            // Capture the element as canvas
-            const canvas = await html2canvas(element, {
-                scale: 2,
-                useCORS: true,
-                logging: false,
-                backgroundColor: '#ffffff'
-            });
-
-            // Convert to PNG
+            const canvas = createExportCanvas();
             const imgData = canvas.toDataURL('image/png');
 
             // Create download link
@@ -265,12 +345,116 @@ export default function DashboardPage() {
             link.href = imgData;
             link.click();
 
+            setExportStatus('complete');
+            setTimeout(() => {
+                setExportStatus(null);
+            }, 2000);
+
         } catch (err) {
             console.error('Error exporting image:', err);
             alert('เกิดข้อผิดพลาดในการส่งออกรูปภาพ: ' + err.message);
+            setExportStatus(null);
         } finally {
             setExporting(false);
         }
+    };
+
+    // Export Modal Component
+    const ExportModal = () => {
+        if (!showExportModal) return null;
+
+        return (
+            <div className="export-modal-overlay" onClick={() => setShowExportModal(false)}>
+                <div className="export-modal" onClick={e => e.stopPropagation()}>
+                    <div className="export-modal-header">
+                        <h3><FaDownload /> ส่งออกรายงาน</h3>
+                        <button className="export-modal-close" onClick={() => setShowExportModal(false)}>
+                            <FaTimes />
+                        </button>
+                    </div>
+
+                    <div className="export-modal-body">
+                        {/* Preview Card */}
+                        <div className="export-preview-container">
+                            <div className="export-preview-content">
+                                <div className="export-preview-header">
+                                    <h2>📊 ผลการประเมินความพึงพอใจ</h2>
+                                    <p>Survey Satisfaction Results</p>
+                                </div>
+
+                                <div className="export-preview-summary">
+                                    <div className="export-summary-item">
+                                        <span>Design</span>
+                                        <strong>{stats?.design?.summary?.mean || '0.00'}</strong>
+                                    </div>
+                                    <div className="export-summary-item">
+                                        <span>Quality</span>
+                                        <strong>{stats?.quality?.summary?.mean || '0.00'}</strong>
+                                    </div>
+                                    <div className="export-summary-item">
+                                        <span>Usability</span>
+                                        <strong>{stats?.usability?.summary?.mean || '0.00'}</strong>
+                                    </div>
+                                    <div className="export-summary-item">
+                                        <span>Usefulness</span>
+                                        <strong>{stats?.usefulness?.summary?.mean || '0.00'}</strong>
+                                    </div>
+                                </div>
+
+                                <div className="export-preview-overall">
+                                    <div className="export-overall-score">
+                                        <span className="score-value">{stats?.overall?.mean || '0.00'}</span>
+                                        <span className="score-label">ค่าเฉลี่ยรวม / Overall Mean</span>
+                                    </div>
+                                    <div className="export-overall-level">
+                                        {getInterpretation(stats?.overall?.mean)}
+                                    </div>
+                                </div>
+
+                                <div className="export-preview-footer">
+                                    <p>📋 ผู้ตอบแบบสอบถามทั้งหมด {stats?.total || 0} คน</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        {/* Export Status */}
+                        {exportStatus && (
+                            <div className={`export-progress ${exportStatus === 'complete' ? 'complete' : ''}`}>
+                                {exportStatus === 'complete' ? (
+                                    <>
+                                        <FaCheckCircle /> ส่งออกสำเร็จ!
+                                    </>
+                                ) : (
+                                    <>
+                                        <div className="spinner"></div>
+                                        กำลังสร้าง{exportStatus === 'pdf' ? ' PDF' : 'รูปภาพ'}...
+                                    </>
+                                )}
+                            </div>
+                        )}
+                    </div>
+
+                    <div className="export-modal-footer">
+                        <Button
+                            variant="primary"
+                            onClick={exportToPDF}
+                            disabled={exporting}
+                            style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px' }}
+                        >
+                            <FaFilePdf /> PDF
+                        </Button>
+                        <Button
+                            variant="primary"
+                            onClick={exportToImage}
+                            disabled={exporting}
+                            style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px', backgroundColor: '#10b981' }}
+                        >
+                            <FaImage /> รูปภาพ
+                        </Button>
+                    </div>
+                </div>
+            </div>
+        );
     };
 
     if (loading) return <div className="loading-container">กำลังโหลดข้อมูล...</div>;
@@ -316,11 +500,11 @@ export default function DashboardPage() {
             <div className="dashboard-container">
                 <div className="dashboard-top-nav">
                     <button className="nav-back-btn" onClick={() => navigate('/')} title="กลับหน้าหลัก">
-                        <FaArrowLeft />
+                        ←
                     </button>
                 </div>
 
-                <div ref={contentRef} className="dashboard-content-export">
+                <div className="dashboard-content-export">
 
                     <header className="dashboard-header">
                         <h1 className="dashboard-title">ผลการประเมินความพึงพอใจ</h1>
@@ -397,31 +581,22 @@ export default function DashboardPage() {
 
                 <div className="back-button-container">
                     {stats?.total > 0 && (
-                        <>
-                            <Button
-                                variant="primary"
-                                onClick={exportToPDF}
-                                disabled={exporting}
-                                style={{ display: 'flex', alignItems: 'center', gap: '8px' }}
-                            >
-                                <FaFilePdf />
-                                {exporting ? 'กำลังส่งออก...' : 'ส่งออก PDF'}
-                            </Button>
-                            <Button
-                                variant="primary"
-                                onClick={exportToImage}
-                                disabled={exporting}
-                                style={{ display: 'flex', alignItems: 'center', gap: '8px', backgroundColor: '#10b981' }}
-                            >
-                                <FaImage />
-                                {exporting ? 'กำลังส่งออก...' : 'ส่งออกรูปภาพ'}
-                            </Button>
-                        </>
+                        <Button
+                            variant="primary"
+                            onClick={() => setShowExportModal(true)}
+                            style={{ display: 'flex', alignItems: 'center', gap: '8px' }}
+                        >
+                            <FaDownload />
+                            ส่งออกรายงาน
+                        </Button>
                     )}
                     <Button variant="secondary" onClick={() => navigate('/')}>
                         กลับหน้าหลัก
                     </Button>
                 </div>
+
+                {/* Export Modal */}
+                <ExportModal />
             </div>
         </div>
     );

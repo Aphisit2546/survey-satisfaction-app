@@ -3,7 +3,7 @@
 // ============================================
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { FaFilePdf, FaTimes, FaDownload, FaCheckCircle } from 'react-icons/fa';
+import { FaFilePdf, FaImage, FaTimes, FaDownload, FaCheckCircle } from 'react-icons/fa';
 import { fetchAllResponses } from '../../services/supabaseClient';
 import Button from '../../components/common/Button/Button';
 import {
@@ -231,6 +231,55 @@ export default function DashboardPage() {
         }
     };
 
+    // Export Report as High-Resolution Image
+    const exportToImage = async () => {
+        if (!stats || stats.total === 0) {
+            alert('ไม่มีข้อมูลสำหรับส่งออก');
+            return;
+        }
+
+        setExporting(true);
+        setExportStatus('image');
+
+        try {
+            const reportElement = document.getElementById('report-pdf-content');
+            if (!reportElement) {
+                throw new Error('Report element not found');
+            }
+
+            // Use html2canvas with high resolution (scale 3 = ~300 DPI for print quality)
+            const canvas = await html2canvas(reportElement, {
+                scale: 3,
+                backgroundColor: '#ffffff',
+                useCORS: true,
+                allowTaint: true,
+                logging: false
+            });
+
+            // Convert to PNG and download
+            const imgData = canvas.toDataURL('image/png', 1.0);
+
+            // Create download link
+            const link = document.createElement('a');
+            const now = new Date();
+            link.download = `Survey_Report_${now.toISOString().split('T')[0]}.png`;
+            link.href = imgData;
+            link.click();
+
+            setExportStatus('complete');
+            setTimeout(() => {
+                setExportStatus(null);
+            }, 2000);
+
+        } catch (err) {
+            console.error('Error exporting image:', err);
+            alert('เกิดข้อผิดพลาดในการส่งออกรูปภาพ: ' + err.message);
+            setExportStatus(null);
+        } finally {
+            setExporting(false);
+        }
+    };
+
     // Export Modal Component
     const ExportModal = () => {
         if (!showExportModal) return null;
@@ -314,6 +363,14 @@ export default function DashboardPage() {
                             style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px', backgroundColor: '#003366' }}
                         >
                             <FaFilePdf /> ดาวน์โหลด PDF
+                        </Button>
+                        <Button
+                            variant="primary"
+                            onClick={exportToImage}
+                            disabled={exporting}
+                            style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px', backgroundColor: '#10b981' }}
+                        >
+                            <FaImage /> ดาวน์โหลดรูปภาพ
                         </Button>
                     </div>
                 </div>

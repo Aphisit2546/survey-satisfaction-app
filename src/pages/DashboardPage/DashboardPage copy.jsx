@@ -143,43 +143,13 @@ export default function DashboardPage() {
         const allIds = [...designIds, ...qualityIds, ...usabilityIds, ...usefulnessIds];
         const overallStats = getCategoryStats(allIds);
 
-        // Calculate Demographics
-        const genderStats = {};
-        const ageStats = {};
-        const departmentStats = {};
-
-        data.forEach(d => {
-            // Gender
-            const gender = d.gender || 'ไม่ระบุ';
-            genderStats[gender] = (genderStats[gender] || 0) + 1;
-
-            // Age
-            let ageLabel = d.age_range || 'ไม่ระบุ';
-            if (ageLabel === 'Other' || ageLabel === 'อื่นๆ') {
-                ageLabel = d.age_other || 'อื่นๆ (ไม่ระบุรายละเอียด)';
-            }
-            ageStats[ageLabel] = (ageStats[ageLabel] || 0) + 1;
-
-            // Department
-            let deptLabel = d.department || 'ไม่ระบุ';
-            if (deptLabel === 'Other' || deptLabel === 'อื่นๆ') {
-                deptLabel = d.department_other || 'อื่นๆ (ไม่ระบุรายละเอียด)';
-            }
-            departmentStats[deptLabel] = (departmentStats[deptLabel] || 0) + 1;
-        });
-
         setStats({
             total,
             design: designStats,
             quality: qualityStats,
             usability: usabilityStats,
             usefulness: usefulnessStats,
-            overall: overallStats,
-            demographics: {
-                gender: genderStats,
-                age: ageStats,
-                department: departmentStats
-            }
+            overall: overallStats
         });
     };
 
@@ -466,45 +436,6 @@ export default function DashboardPage() {
                         <div className="stat-card">
                             <div className="stat-value">{stats?.total || 0}</div>
                             <div className="stat-label">ผู้ตอบแบบสอบถามทั้งหมด</div>
-                        </div>
-                    </div>
-
-                    <div className="stats-summary">
-                        {/* Demographics Cards */}
-                        <div className="stat-card demographic-card">
-                            <h3 className="demographic-title">เพศ (Gender)</h3>
-                            <ul className="demographic-list">
-                                {stats?.demographics?.gender && Object.entries(stats.demographics.gender).map(([key, value]) => (
-                                    <li key={key}>
-                                        <span>{key}</span>
-                                        <span>{value} คน</span>
-                                    </li>
-                                ))}
-                            </ul>
-                        </div>
-
-                        <div className="stat-card demographic-card">
-                            <h3 className="demographic-title">อายุ (Age)</h3>
-                            <ul className="demographic-list">
-                                {stats?.demographics?.age && Object.entries(stats.demographics.age).map(([key, value]) => (
-                                    <li key={key}>
-                                        <span>{key}</span>
-                                        <span>{value} คน</span>
-                                    </li>
-                                ))}
-                            </ul>
-                        </div>
-
-                        <div className="stat-card demographic-card">
-                            <h3 className="demographic-title">แผนก/ตำแหน่ง (Department)</h3>
-                            <ul className="demographic-list">
-                                {stats?.demographics?.department && Object.entries(stats.demographics.department).map(([key, value]) => (
-                                    <li key={key}>
-                                        <span>{key}</span>
-                                        <span>{value} คน</span>
-                                    </li>
-                                ))}
-                            </ul>
                         </div>
                     </div>
 

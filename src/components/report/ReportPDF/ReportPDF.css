@@ -77,6 +77,48 @@
     border-left: 4px solid #003366;
 }
 
+/* Demographic Grid */
+.report-demographic-grid {
+    display: flex;
+    justify-content: space-between;
+    gap: 16px;
+    margin-bottom: 24px;
+}
+
+.demographic-box {
+    flex: 1;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    padding: 12px;
+}
+
+.demographic-box h4 {
+    margin: 0 0 8px 0;
+    font-size: 16px;
+    color: #003366;
+    border-bottom: 1px solid #eee;
+    padding-bottom: 4px;
+}
+
+.demographic-box ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.demographic-box li {
+    display: flex;
+    justify-content: space-between;
+    font-size: 14px;
+    padding: 4px 0;
+    border-bottom: 1px dashed #f0f0f0;
+    color: #333;
+}
+
+.demographic-box li:last-child {
+    border-bottom: none;
+}
+
 /* ============================================
    Table Styles
    ============================================ */

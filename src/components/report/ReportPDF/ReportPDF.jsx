@@ -52,10 +52,50 @@ export default function ReportPDF({ stats, getInterpretation }) {
                 <p className="report-subtitle">ตารางแสดงค่าเฉลี่ย (Mean) และส่วนเบี่ยงเบนมาตรฐาน (S.D.)</p>
 
                 <div className="report-info">
-                    <p><strong>จำนวนผู้ตอบแบบสอบถาม:</strong> {stats.total} คน</p>
                     <p><strong>ผู้จัดทำ:</strong> 654295028 นายอภิสิทธิ์ จันมุณี</p>
+                    <p><strong>จำนวนผู้ตอบแบบสอบถาม:</strong> {stats.total} คน</p>
                 </div>
             </header>
+
+            {/* Demographic Summary */}
+            <div className="report-table-section">
+                <h3 className="report-table-title">ข้อมูลทั่วไปของผู้ตอบแบบสอบถาม</h3>
+                <div className="report-demographic-grid">
+                    <div className="demographic-box">
+                        <h4>เพศ (Gender)</h4>
+                        <ul>
+                            {stats.demographics && stats.demographics.gender && Object.entries(stats.demographics.gender).map(([key, value]) => (
+                                <li key={key}>
+                                    <span>{key}</span>
+                                    <span>{value} คน</span>
+                                </li>
+                            ))}
+                        </ul>
+                    </div>
+                    <div className="demographic-box">
+                        <h4>อายุ (Age)</h4>
+                        <ul>
+                            {stats.demographics && stats.demographics.age && Object.entries(stats.demographics.age).map(([key, value]) => (
+                                <li key={key}>
+                                    <span>{key}</span>
+                                    <span>{value} คน</span>
+                                </li>
+                            ))}
+                        </ul>
+                    </div>
+                    <div className="demographic-box">
+                        <h4>แผนก/ตำแหน่ง (Department)</h4>
+                        <ul>
+                            {stats.demographics && stats.demographics.department && Object.entries(stats.demographics.department).map(([key, value]) => (
+                                <li key={key}>
+                                    <span>{key}</span>
+                                    <span>{value} คน</span>
+                                </li>
+                            ))}
+                        </ul>
+                    </div>
+                </div>
+            </div>
 
             {/* Evaluation Tables */}
             <main className="report-content">
